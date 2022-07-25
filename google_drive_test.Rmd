@@ -43,21 +43,30 @@ drive_find(pattern = "frog")
 
 drive_find(pattern = ".rds")
 
-# drive get will find and show all files and ID's in specific folder. 
 
-#you can point to folder locations with direct URL
-drive_get("https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp")
+# drive_get will find and show all files and ID's in a specific folder. 
+
+#you can point to folder locations with a direct URL
+# a dribble is created with 3 variables, the name of the folder, unique id for the folder, and a drive resource
+modeling_folder <- drive_get("https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp")
+
+modeling_folder_id <- modeling_folder$id
 
 # or you can point to folder locations with folder or file IDs
 drive_get(id = "1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp")
 
+drive_get(id = modeling_folder_id)
 
-# you can now see all 30 files in your drive. 
+#the as_id function is another method for determinning id of a folder or file
+drive_get(as_id("https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp"))
 
-# the file id, column 2, is how you to make file selection for download
+#drive_ls function is the same ls in the command line. It lists all the files with in that directory, google drive url, or google drive id
+drive_ls(modeling_folder)
+
+
 
 ```
-
+# example how to download a set of model outputs within a folder
 ```{r}
 
 model_output_folder <- "https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp"
@@ -67,8 +76,14 @@ model_output_folder_id <- drive_get(as_id(model_output_folder))
 files <- drive_ls(model_output_folder_id) 
 
 for (file in files$id){
-  drive_download(as_id(file), path = here("data"), overwrite = T)
+  drive_download(file = as_id(file), overwrite = T)
 }
+
+```
+
+```{r}
+#download single file and to data folder and rename
+drive_download("merged_AmphibianCaptureSurvey", path = here("data", "penn_amphib.csv"), overwrite = T)
 
 ```
 
