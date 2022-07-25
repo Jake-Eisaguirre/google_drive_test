@@ -7,5 +7,68 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+```{r}
+if (!require(librarian)){
+  install.packages("librarian")
+  library(librarian)
+}
+
+# librarian downloads, if not already downloaded, and reads in needed packages
+
+librarian::shelf(googledrive, here, tidyverse)
+
+```
+
+```{r}
+# run this, look in console and enter "1" for yes. Then hit enter. You will be taken to google drive on a browser where you will authenticate the connection between R studio and google drive.
+
+drive_auth(email = "insert google drive connected email")
+```
+
+
+```{r}
+
+
+
+# drive find search by file properties or text patterns
+drive_find(n_max = 30)
+
+drive_find(type = "csv")
+
+drive_find(pattern = "frog")
+
+drive_find(pattern = ".rds")
+
+# drive get will find and show all files and ID's in specific folder. 
+
+#you can point to folder locations with direct URL
+drive_get("https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp")
+
+# or you can point to folder locations with folder or file IDs
+drive_get(id = "1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp")
+
+
+# you can now see all 30 files in your drive. 
+
+# the file id, column 2, is how you to make file selection for download
+
+```
+
+```{r}
+
+model_output_folder <- "https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp"
+
+model_output_folder_id <- drive_get(as_id(model_output_folder))
+
+files <- drive_ls(model_output_folder_id) 
+
+for (file in files$id){
+  drive_download(as_id(file), path = here("data"), overwrite = T)
+}
+
 ```
 
