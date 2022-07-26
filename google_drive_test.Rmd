@@ -1,5 +1,5 @@
 ---
-title: "google_drivetest"
+title: "googledrive tutorial"
 author: "Jake Eisaguirre"
 date: "7/25/2022"
 output: html_document
@@ -23,18 +23,18 @@ librarian::shelf(googledrive, here, tidyverse)
 
 ```
 
+### Authenticate `Rstudio` and `googledrive`
 ```{r}
-# run this, look in console and enter "1" for yes. Then hit enter. You will be taken to google drive on a browser where you will authenticate the connection between R studio and google drive.
-
-drive_auth(email = "insert google drive connected email")
+#drive_auth(email = "insert google drive connected email")
 ```
 
 
+### The basics of the `googledrive` package
+
+
+#### `drive_find` will search by file properties or text patterns. 
 ```{r}
 
-
-
-# drive find search by file properties or text patterns
 drive_find(n_max = 30)
 
 drive_find(type = "csv")
@@ -42,31 +42,42 @@ drive_find(type = "csv")
 drive_find(pattern = "frog")
 
 drive_find(pattern = ".rds")
+```
 
 
-# drive_get will find and show all files and ID's in a specific folder. 
-
-#you can point to folder locations with a direct URL
-# a dribble is created with 3 variables, the name of the folder, unique id for the folder, and a drive resource
+#### `drive_get` will find and show all files and ID's in a specific folder. You can point to a folder locations with a direct URL. A dribble is created with 3 variables, the name of the folder, unique id for the folder, and a drive resource.
+```{r}
 modeling_folder <- drive_get("https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp")
 
 modeling_folder_id <- modeling_folder$id
+```
 
-# or you can point to folder locations with folder or file IDs
+#### Or you can point to folder locations with folder or file IDs
+```{r}
 drive_get(id = "1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp")
 
 drive_get(id = modeling_folder_id)
+```
 
-#the as_id function is another method for determinning id of a folder or file
+#### the `as_id` function is another method for determinning id of a folder or file
+```{r}
 drive_get(as_id("https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp"))
 
-#drive_ls function is the same ls in the command line. It lists all the files with in that directory, google drive url, or google drive id
+```
+
+#### `drive_ls` function is the same as `ls` in the command line. It lists all the files with in that directory, google drive url, or google drive id
+```{r}
 drive_ls(modeling_folder)
 
-
-
 ```
-# example how to download a set of model outputs within a folder
+
+#### `drive_rm` function is same as `rm` in the command line. Will remove the folder or file from the google drive
+```{r}
+drive_rm("insert folder/file name or id")
+```
+
+
+### Example how to download a set of model outputs within a folder
 ```{r}
 
 model_output_folder <- "https://drive.google.com/drive/folders/1uWqLha9Gz1dkUXMkf6JWmMcBxDpso6Wp"
@@ -75,15 +86,39 @@ model_output_folder_id <- drive_get(as_id(model_output_folder))
 
 files <- drive_ls(model_output_folder_id) 
 
-for (file in files$id){
-  drive_download(file = as_id(file), overwrite = T)
+for (i in files$id){
+  drive_download(file = as_id(i), path = paste0(here("data"), "/", i), overwrite = T)
 }
 
+# inlcude `path = ` to point specific location where to download files
+
+
 ```
 
+### Example how to download single file and to data folder and rename
 ```{r}
-#download single file and to data folder and rename
-drive_download("merged_AmphibianCaptureSurvey", path = here("data", "penn_amphib.csv"), overwrite = T)
+
+# file = name or id of specified file of interest
+# path = local path to download too
+# type = file type for saving
+
+drive_download(file = "merged_AmphibianCaptureSurvey", path = here("data", "penn_amphib.csv"), type = "csv", overwrite = T)
 
 ```
+
+### `drive_upload` will upload files or folders to the pointed google drive folder
+```{r}
+# media = local path
+# path = path to google drive. Use the 'as_id' for ease
+
+data_management_folder <- "https://drive.google.com/drive/folders/1ILolJkIp-NVEupfa877TgpUgRjkAqJdp"
+
+data_management_folder_id <- drive_get(as_id(data_management_folder))
+
+drive_upload(media = here("data", "penn_amphib.csv"), path = as_id(data_management_folder_id))
+
+```
+
+
+
 
